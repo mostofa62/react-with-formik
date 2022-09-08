@@ -3,6 +3,6 @@
 
 ### Library Used
 [https://formik.org](FORMIK) 
-[https://react-select.com/home](React Select)
+[https://react-select.com/home](ReactSelect)
 
 
