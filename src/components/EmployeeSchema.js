@@ -23,8 +23,19 @@ export default object().shape({
                 value: string().required("Required Skill"),
                 label: string().required("Required")
               })
-            )
+            ),
+
+            purchased:array()
+            .min(2, "Need at least 2 Items Required!!")
+            .of( 
             
+              number()
+              .required()
+            ),
+
+            kicked: number()
+            .nullable()
+              .required("Kicked From Where?"),
 
 
             

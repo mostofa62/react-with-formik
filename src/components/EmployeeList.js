@@ -7,13 +7,64 @@ import Checkbox from './checkbox';
 import SelectField from './SelectField';
 
 const EmployeeList = ()=>{
-    /*
-    const employees = [
-        {name:'Mostofa',desg:'1',enabled:false},
-        {name:'Nadim',desg:'2',enabled:false},
-        {name:'Imran',desg:'3',enabled:true},
+
+    const employee_new_entry = { 
+        name:'', 
+        desg:'',
+        enabled:false, 
+        tested:"", 
+        skills:[],
+        purchased:[],
+        kicked:null
+    };
+    const items = [
+        {value:1,label:"Mango"},
+        {value:2, label:"Orange"},
+        {value:3, label:"Banana"},
+        {value:4, label:"Coconut"}
+    ]
+    const kicked_from =[
+        {value:1,label:"Roof"},
+        {value:2, label:"Balcony"},
+        {value:3, label:"Road"},
     ];
-    */
+    
+    const employees = [
+        {
+            name:'Mostofa',
+            desg:'1',
+            enabled:false,
+            tested: { value: 'vanilla', label: 'Vanilla' },
+            skills:[
+                {value:'c', label:'C'},        
+            ],
+            purchased:[1,4],
+            kicked:2
+
+        },
+        {
+            name:'Nadim',
+            desg:'2',
+            enabled:false,
+            tested:"",
+            skills:[],
+            purchased:[3],
+            kicked:3
+        },
+        {
+            name:'Imran',
+            desg:'3',
+            enabled:true,
+            tested:"",
+            skills:[
+                {value:'c++', label:'C++'},
+                {value:'javascript', label:'JavaScript'}
+            ],
+            purchased:[],
+            kicked:null
+        },
+    ];
+    
     const [data, setData] = useState([]);
     const options = [
         { value: 'chocolate', label: 'Chocolate' },
@@ -27,14 +78,17 @@ const EmployeeList = ()=>{
         {value:'c++', label:'C++'},
         {value:'javascript', label:'JavaScript'}
     ];
+
+    
       
 
     return (
     <Fragment>
 
-        <h1>Employee List</h1>
+        <h1>Employee List- With Initials Values</h1>
         <Formik
-        initialValues={{ employees:[] }}
+        /*initialValues={{ employees:[] }}*/
+        initialValues={{ employees }}
         validationSchema={EmployeeSchema}
 
         onSubmit={values =>
@@ -44,7 +98,7 @@ const EmployeeList = ()=>{
             }, 500)
         }
    
-        render={({values,errors, touched, setFieldValue, setFieldTouched})=>(
+        render={({isValid, isSubmitting,values,errors, touched, setFieldValue, setFieldTouched})=>(
             
             <Form>
                 {errors.employees  && errors.employees.constructor!==Array && (<span>{errors.employees}</span>)}
@@ -57,6 +111,7 @@ const EmployeeList = ()=>{
                             (
                                 values.employees.map((employee, index)=>(
                                     <div key={index}>
+                                        <h5>{index+1}</h5>
                                         <Field name={`employees[${index}].name`} />
                                         
                                         {errors.employees &&
@@ -139,6 +194,98 @@ isSearchable
 
                                   
                                         <br/>
+
+
+
+<div className='purchase-list'>
+    {items.map((item, i)=>(
+            <Field
+            label={item.label}
+            type="checkbox"
+            component={Checkbox}
+            name={`employees.${index}.purchased`}
+            checked={values.employees[index].purchased.includes(item.value)}
+            onChange={(e) => {
+            const {checked, name} = e.target;  
+                console.log(checked,name)
+              
+                if (checked) {
+
+                    setFieldValue(
+                        name,
+                        [...values.employees[index].purchased, item.value]
+                    );
+                }else{
+
+                    setFieldValue(
+                        name,
+                        values.employees[index].purchased.filter((v) => v !== item.value)
+                    );
+
+                }
+            }}
+          />
+
+    ))}
+<br/>
+{errors.employees 
+                                 && errors.employees[index] 
+                                 &&  errors.employees[index].purchased
+                                 && touched.employees &&
+                                        touched.employees[index] &&
+                                        touched.employees[index].purchased
+                                 && (<span>{errors.employees[index].purchased}</span>)}
+
+    
+</div>
+<div className='kicked_from'>
+    { kicked_from.map((kickedf,i)=>(
+        
+        <>
+        <Field
+            label={kickedf.label}
+            type="radio"
+            component={Checkbox}
+            name={`employees.${index}.kicked`}
+            checked={values.employees[index].kicked === kickedf.value}
+            onChange={(e) => {
+            const {checked, name} = e.target;  
+                console.log(checked,name)
+              
+                if (checked) {
+
+                    setFieldValue(
+                        name,
+                        kickedf.value
+                    );
+                }else{
+
+                    setFieldValue(
+                        name,
+                        null
+                    );
+
+                }
+            }}
+          />
+        
+        </>
+
+    ))
+
+    }
+<br/>
+{errors.employees 
+                                 && errors.employees[index] 
+                                 &&  errors.employees[index].kicked
+                                 && touched.employees &&
+                                        touched.employees[index] &&
+                                        touched.employees[index].kicked
+                                 && (<span>{errors.employees[index].kicked}</span>)}
+
+</div>
+
+
                                         <button
                                         type="button"
                                         onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
@@ -147,17 +294,18 @@ isSearchable
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => arrayHelpers.insert(index, {name:'',desg:'',enabled:false, tested:"", skills:[]})} // insert an empty string at a position
+                                            onClick={() => arrayHelpers.insert(index+1, employee_new_entry)} // insert an empty string at a position
                                         >
                                         +
                                         </button>
-
+                                        <hr/>
                                     </div>
+                                    
 
                                 ))
                             ):
                             (
-                                <button type="button" onClick={() => arrayHelpers.push({ name:'', desg:'',enabled:false, tested:"", skills:[]})}>                     
+                                <button type="button" onClick={() => arrayHelpers.push(employee_new_entry)}>                     
                                     Add a Employee
                                 </button>
                             )
@@ -165,7 +313,7 @@ isSearchable
                         }
 
                     <div>
-                        <button type="submit">Submit</button>
+                        <button disabled={!isValid || isSubmitting} type="submit">Submit</button>
                     </div>
 
                     <code>
